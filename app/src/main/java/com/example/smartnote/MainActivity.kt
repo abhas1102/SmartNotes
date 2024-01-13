@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("title", receivedNote!!.title)
             notesList.add(receivedNote!!)
             binding.txtNoNewNotesAdded.visibility = View.GONE
-            addNotes()
+//            addNotes()
         }
     }
 }
