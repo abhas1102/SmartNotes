@@ -43,9 +43,10 @@ class AddNotesActivity : AppCompatActivity() {
         }
         submitNotes()
     }
+    @RequiresApi(Build.VERSION_CODES.S)
     fun submitNotes() {
         binding.btnSubmitNote.setOnClickListener {
-            val note = TodayNotes(binding.addTitle.text.toString(), binding.addDescription.text.toString())
+            val note = TodayNotes(binding.addTitle.text.toString(), binding.addDescription.text.toString(),file.path)
             val intent = Intent()
             intent.putExtra("note",note)
             setResult(RESULT_OK,intent)
