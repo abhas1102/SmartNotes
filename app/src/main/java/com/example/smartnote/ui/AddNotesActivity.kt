@@ -7,7 +7,9 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -16,11 +18,14 @@ import com.example.smartnote.R
 import com.example.smartnote.databinding.AddNotesBinding
 import com.example.smartnote.model.TodayNotes
 import java.io.File
+import kotlin.math.absoluteValue
 
 class AddNotesActivity : AppCompatActivity() {
     lateinit var binding:AddNotesBinding
-    @RequiresApi(Build.VERSION_CODES.S)
-    var file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),"recordtest.3gp")
+    var directory = getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+    var baseFileName = "record"
+    var file:File? = null
+    var counter = 0
 
     lateinit var mediaRecorder: MediaRecorder
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +33,13 @@ class AddNotesActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.add_notes)
         mediaRecorder = MediaRecorder()
         checkPermission()
+        /*if (!directory.exists()) {
+            directory.mkdirs()
+        }*/
+
         binding.audioRecorder.setOnClickListener {
             binding.stopRecording.visibility = View.VISIBLE
-            binding.audioRecorder.visibility = View.INVISIBLE
+            binding.audioRecorder.visibility = View.GONE
             recordAudio()
         }
         binding.stopRecording.setOnClickListener {
@@ -43,10 +52,9 @@ class AddNotesActivity : AppCompatActivity() {
         }
         submitNotes()
     }
-    @RequiresApi(Build.VERSION_CODES.S)
     fun submitNotes() {
         binding.btnSubmitNote.setOnClickListener {
-            val note = TodayNotes(binding.addTitle.text.toString(), binding.addDescription.text.toString(),file.path)
+            val note = TodayNotes(binding.addTitle.text.toString(), binding.addDescription.text.toString(),file!!.path)
             val intent = Intent()
             intent.putExtra("note",note)
             setResult(RESULT_OK,intent)
@@ -59,6 +67,8 @@ class AddNotesActivity : AppCompatActivity() {
             PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECORD_AUDIO,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE),111)
+        } else {
+            Toast.makeText(this,"Permission granted",Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -69,11 +79,21 @@ class AddNotesActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 111 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            true
+        if (requestCode == 111 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this,"Permission granted",Toast.LENGTH_SHORT).show()
+        }
+
     }
-    @RequiresApi(Build.VERSION_CODES.S)
     fun recordAudio() {
+        while (file!!.exists()) {
+            val fileName = if (counter == 0) {
+                "$baseFileName.3gp"
+            } else {
+                "$baseFileName$counter.3gp"
+            }
+            file = File(directory,fileName)
+        }
+
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
         mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB)
@@ -84,10 +104,9 @@ class AddNotesActivity : AppCompatActivity() {
     fun stopRecording() {
         mediaRecorder.stop()
     }
-    @RequiresApi(Build.VERSION_CODES.S)
     fun playRecording() {
         var mp = MediaPlayer()
-        mp.setDataSource(file.absolutePath)
+        mp.setDataSource(file?.absolutePath)
         mp.prepare()
         mp.start()
     }
