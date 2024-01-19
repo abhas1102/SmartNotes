@@ -85,13 +85,14 @@ class AddNotesActivity : AppCompatActivity() {
 
     }
     fun recordAudio() {
-        while (file!!.exists()) {
+        while (file == null || file!!.exists()) {
             val fileName = if (counter == 0) {
                 "$baseFileName.3gp"
             } else {
                 "$baseFileName$counter.3gp"
             }
             file = File(directory,fileName)
+            counter++
         }
 
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
