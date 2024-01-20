@@ -4,13 +4,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.getExternalStoragePublicDirectory
+import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -18,8 +17,11 @@ import androidx.databinding.DataBindingUtil
 import com.example.smartnote.R
 import com.example.smartnote.databinding.AddNotesBinding
 import com.example.smartnote.model.TodayNotes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
-import kotlin.math.absoluteValue
 
 class AddNotesActivity : AppCompatActivity() {
     lateinit var binding:AddNotesBinding
@@ -28,6 +30,9 @@ class AddNotesActivity : AppCompatActivity() {
     var baseFileName = "record"
     var file:File? = null
     var counter = 0
+    var isPlaying = false
+    var isRecording = false
+    var mediaPlayer = MediaPlayer()
 
     lateinit var mediaRecorder: MediaRecorder
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,10 +45,13 @@ class AddNotesActivity : AppCompatActivity() {
         }*/
 
         binding.audioRecorder.setOnClickListener {
-            binding.recordPlayAnimation.visibility = View.VISIBLE
-            binding.recordPlayAnimation.playAnimation()
             binding.audioRecorder.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_stop))
+            binding.recordPlayAnimation.visibility = View.VISIBLE
             recordAudio()
+
+
+
+
         }
         submitNotes()
     }
@@ -80,6 +88,7 @@ class AddNotesActivity : AppCompatActivity() {
 
     }
     fun recordAudio() {
+
         while (file == null || file!!.exists()) {
             val fileName = if (counter == 0) {
                 "$baseFileName.3gp"
@@ -96,25 +105,51 @@ class AddNotesActivity : AppCompatActivity() {
         mediaRecorder.setOutputFile(file)
         mediaRecorder.prepare()
         mediaRecorder.start()
+        isRecording = true
+//        binding.recordPlayAnimation.playAnimation()
+
+        GlobalScope.launch(Dispatchers.Main) {
+            while (isRecording) {
+                // Update the animation
+                binding.recordPlayAnimation.playAnimation()
+                // Delay for a short period (e.g., 100 milliseconds)
+                delay(100)
+            }
+
+            // Stop the animation when recording is complete
+            binding.recordPlayAnimation.cancelAnimation()
+        }
+
         binding.audioRecorder.setOnClickListener {
             binding.audioRecorder.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_play))
             stopRecording()
             binding.recordPlayAnimation.pauseAnimation()
             binding.audioRecorder.setOnClickListener {
                 playRecording()
+                var repeatCountForAnimation:Int = ((mediaPlayer.duration) / 1000)
+                binding.recordPlayAnimation.repeatCount = repeatCountForAnimation
                 binding.recordPlayAnimation.playAnimation()
+
+
+
+                Log.d("mediaplayerduration",repeatCountForAnimation.toString())
+
             }
         }
     }
     fun stopRecording() {
+        isRecording = false
         mediaRecorder.stop()
     }
     fun playRecording() {
-        var mp = MediaPlayer()
-        mp.setDataSource(file?.absolutePath)
-        mp.prepare()
-        mp.start()
+        isPlaying = true
+//        var mp = MediaPlayer()
+        mediaPlayer.setDataSource(file?.absolutePath)
+        mediaPlayer.prepare()
+        mediaPlayer.start()
     }
 
 
 }
+
+
