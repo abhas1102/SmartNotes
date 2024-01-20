@@ -26,29 +26,23 @@
             android:hint="@string/start_writing_description"/>
         <ImageView
             android:id="@+id/audio_recorder"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/ic_record"
             app:layout_constraintTop_toBottomOf="@id/add_description"
-            app:layout_constraintStart_toStartOf="@id/add_description"
-            android:layout_marginStart="50dp"/>
-        <ImageView
-            android:id="@+id/stop_recording"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/ic_stop"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/add_description"
-            app:layout_constraintStart_toStartOf="@id/add_description"
-            android:layout_marginStart="50dp"/>
-        <ImageView
-            android:id="@+id/play_recording"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            app:layout_constraintStart_toStartOf="@id/add_description" />
+
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/record_play_animation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:lottie_rawRes="@raw/record_play"
             android:visibility="gone"
             app:layout_constraintStart_toEndOf="@id/audio_recorder"
             app:layout_constraintTop_toTopOf="@id/audio_recorder"
-            android:src="@drawable/ic_play"/>
+            app:layout_constraintBottom_toBottomOf="@id/audio_recorder"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_submit_note"

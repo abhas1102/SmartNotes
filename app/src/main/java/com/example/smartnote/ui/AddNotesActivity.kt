@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.smartnote.R
 import com.example.smartnote.databinding.AddNotesBinding
@@ -23,6 +24,7 @@ import kotlin.math.absoluteValue
 class AddNotesActivity : AppCompatActivity() {
     lateinit var binding:AddNotesBinding
     var directory = getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+//    var directory = File(Environment.getExternalStorageDirectory(),"SmartNotes")
     var baseFileName = "record"
     var file:File? = null
     var counter = 0
@@ -38,17 +40,10 @@ class AddNotesActivity : AppCompatActivity() {
         }*/
 
         binding.audioRecorder.setOnClickListener {
-            binding.stopRecording.visibility = View.VISIBLE
-            binding.audioRecorder.visibility = View.GONE
+            binding.recordPlayAnimation.visibility = View.VISIBLE
+            binding.recordPlayAnimation.playAnimation()
+            binding.audioRecorder.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_stop))
             recordAudio()
-        }
-        binding.stopRecording.setOnClickListener {
-            binding.stopRecording.visibility = View.GONE
-            binding.playRecording.visibility = View.VISIBLE
-            stopRecording()
-        }
-        binding.playRecording.setOnClickListener {
-            playRecording()
         }
         submitNotes()
     }
@@ -101,6 +96,15 @@ class AddNotesActivity : AppCompatActivity() {
         mediaRecorder.setOutputFile(file)
         mediaRecorder.prepare()
         mediaRecorder.start()
+        binding.audioRecorder.setOnClickListener {
+            binding.audioRecorder.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_play))
+            stopRecording()
+            binding.recordPlayAnimation.pauseAnimation()
+            binding.audioRecorder.setOnClickListener {
+                playRecording()
+                binding.recordPlayAnimation.playAnimation()
+            }
+        }
     }
     fun stopRecording() {
         mediaRecorder.stop()
