@@ -26,6 +26,7 @@ import java.io.File
 class AddNotesActivity : AppCompatActivity() {
     lateinit var binding:AddNotesBinding
     var directory = getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+
 //    var directory = File(Environment.getExternalStorageDirectory(),"SmartNotes")
     var baseFileName = "record"
     var file:File? = null
@@ -48,10 +49,6 @@ class AddNotesActivity : AppCompatActivity() {
             binding.audioRecorder.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_stop))
             binding.recordPlayAnimation.visibility = View.VISIBLE
             recordAudio()
-
-
-
-
         }
         submitNotes()
     }
@@ -115,7 +112,6 @@ class AddNotesActivity : AppCompatActivity() {
                 // Delay for a short period (e.g., 100 milliseconds)
                 delay(100)
             }
-
             // Stop the animation when recording is complete
             binding.recordPlayAnimation.cancelAnimation()
         }
@@ -129,9 +125,6 @@ class AddNotesActivity : AppCompatActivity() {
                 var repeatCountForAnimation:Int = ((mediaPlayer.duration) / 1000)
                 binding.recordPlayAnimation.repeatCount = repeatCountForAnimation
                 binding.recordPlayAnimation.playAnimation()
-
-
-
                 Log.d("mediaplayerduration",repeatCountForAnimation.toString())
 
             }
@@ -148,7 +141,6 @@ class AddNotesActivity : AppCompatActivity() {
         mediaPlayer.prepare()
         mediaPlayer.start()
     }
-
 
 }
 
